@@ -19,3 +19,6 @@ v= input("Thirdly, you have to think about the positives and remember the goal a
 print (v)
 c= input("Also, you have to occupy your mind, the new, as an example, that if you want to become a pilot, you have to first graduate from pilots, but work your mind with these dreams and how")
 print (c) 
+git add
+git commit
+tab 
