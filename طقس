@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+import socket
+import requests
+import threading
+from urllib.parse import urlparse
+
+# Terminal Formatting Colors
+GREEN = "\033[92m"
+RED = "\033[91m"
+BLUE = "\033[94m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+
+class CoreVulnerabilityScanner:
+    def __init__(self, target):
+        self.target = target
+        self.host = self.extract_host(target)
+        self.open_ports = []
+
+    def extract_host(self, target):
+        """Extracts the hostname or IP address from the user input."""
+        if not target.startswith(('http://', 'https://')):
+            target = 'http://' + target
+        parsed = urlparse(target)
+        return parsed.hostname
+
+    def check_port(self, port):
+        """Scans a specific port and attempts service banner grabbing."""
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1.5)
+            result = sock.connect_ex((self.host, port))
+            
+            if result == 0:
+                self.open_ports.append(port)
+                try:
+                    sock.send(b"HEAD / HTTP/1.1\r\n\r\n")
+                    banner = sock.recv(1024).decode(errors='ignore').strip().split('\n')[0]
+                    print(f"{GREEN}[+] Port {port:<5} [OPEN] | Service Info: {banner[:50]}{RESET}")
+                except:
+                    print(f"{GREEN}[+] Port {port:<5} [OPEN] | Service Info: Unknown Service{RESET}")
+            sock.close()
+        except Exception:
+            pass
